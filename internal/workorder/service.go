@@ -118,10 +118,8 @@ func (s *Service) Assign(ctx context.Context, id, assignee, actor, requestID str
 		return apperr.Wrap(apperr.CodeInternal, "assign work order failed", err)
 	}
 	if affected == 0 {
-		s.logger.Debug("assignment already applied", apperr.F("work_order", id))
-		return nil
+		return apperr.Conflict("work_order", id, wo.Version)
 	}
-	wo.Version++
 	_ = s.audit.RecordTransition(ctx, actor, "assign_work_order", id,
 		domain.EntityWorkOrder, string(wo.Status), newStatus, requestID)
 	return nil
