@@ -102,9 +102,9 @@ func (s *SQLiteStore) UpdateWorkOrderStatus(ctx context.Context, id string, stat
 		completedAtExpr = ", completed_at = ?"
 		args = append(args, nowStamp())
 	}
-	args = append(args, nowStamp(), id)
+	args = append(args, nowStamp(), id, version)
 	query := fmt.Sprintf(`UPDATE work_orders SET status = ?%s%s, version = version + 1, updated_at = ?
-		WHERE id = ?`, startedAtExpr, completedAtExpr)
+		WHERE id = ? AND version = ?`, startedAtExpr, completedAtExpr)
 	res, err := ex.Exec(query, args...)
 	if err != nil {
 		return 0, fmt.Errorf("update work order status: %w", err)
